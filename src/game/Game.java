@@ -1,81 +1,51 @@
 package game;
 
-import city.cs.engine.*;
-import city.cs.engine.Shape;
-import org.jbox2d.common.Vec2;
-
 import javax.swing.JFrame;
 
-import java.awt.*;
-import java.io.IOException;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
-
 /**
- * Your main game entry point
+ * The main entry point for the "Cinder's Shadow" game.
+ * This handles the window setup and launching the world.
  */
 public class Game {
 
+    /** The World in which the bodies move and interact. */
+    private GameLevel world;
 
-    /** Initialise a new Game. */
+    /** A graphical view of the world. */
+    private MyView view;
+
     public Game() {
+        // 1. Create the world (Level 1)
+        world = new GameLevel();
+        world.populate(this);
 
-        //1. make an empty game world
-        World world = new World();
+        // 2. Create a view to look into the world
+        // 800x600 is the resolution recommended in the PDF
+        view = new MyView(world, 800, 600);
 
-        //2. populate it with bodies (ex: platforms, collectibles, characters)
-
-        //make a ground platform
-        Shape shape = new BoxShape(30, 0.5f);
-        StaticBody ground = new StaticBody(world, shape);
-        ground.setPosition(new Vec2(0f, -11.5f));
-
-        // make a suspended platform
-        Shape platformShape = new BoxShape(3, 0.5f);
-        StaticBody platform1 = new StaticBody(world, platformShape);
-        platform1.setPosition(new Vec2(-8, -4f));
-
-        //make a character (with an overlaid image)
-        Shape studentShape = new BoxShape(1,2);
-        DynamicBody student = new DynamicBody(world, studentShape);
-        student.setPosition(new Vec2(4,-5));
-        student.addImage(new BodyImage("data/student.png", 4));
-
-
-        //3. make a view to look into the game world
-        UserView view = new UserView(world, 500, 500);
-
-
-        //optional: draw a 1-metre grid over the view
-        // view.setGridResolution(1);
-
-
-        //4. create a Java window (frame) and add the game
-        //   view to it
-        final JFrame frame = new JFrame("City Game");
+        // 3. Create a Java Window (JFrame) to hold the view
+        final JFrame frame = new JFrame("Cinder's Shadow - Milestone 1");
         frame.add(view);
 
-        // enable the frame to quit the application
-        // when the x button is pressed
+        // 4. Enable keyboard controls
+        Controller controller = new Controller(world.getKnight());
+        frame.addKeyListener(controller);
+
+        // 5. Standard Window settings
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationByPlatform(true);
-        // don't let the frame be resized
         frame.setResizable(false);
-        // size the frame to fit the world view
         frame.pack();
-        // finally, make the frame visible
         frame.setVisible(true);
 
-        //optional: uncomment this to make a debugging view
-         JFrame debugView = new DebugViewer(world, 500, 500);
-
-        // start our game world simulation!
+        // 6. Start the physics engine
         world.start();
+
+        // 7. Focus the window so keyboard works immediately
+        frame.requestFocus();
     }
 
-    /** Run the game. */
     public static void main(String[] args) {
-
         new Game();
     }
 }
