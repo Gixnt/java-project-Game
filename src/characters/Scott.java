@@ -5,7 +5,7 @@ import city.cs.engine.*;
 public class Scott extends Walker {
     private static final Shape shape = new BoxShape(1, 2);
 
-    private static final BodyImage image = new BodyImage("data/student.png", 4f);
+    private static final BodyImage image = new BodyImage("data/ScottPilgrim.png", 4f);
 
     private int lives = 3;
 
