@@ -3,17 +3,19 @@ package inputs;
 import characters.EvilEx;
 import characters.Scott;
 import levels.GameLevel;
+import org.jbox2d.common.Vec2;
+
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class Controller extends KeyAdapter {
     // Adjusting these values changes how the game feels.
     private static final float JUMP_SPEED = 20;
-    private static final float WALK_SPEED = 10;
+    private static final float WALK_SPEED = 8;
 
     private Scott scott;
     private EvilEx evilEx;
-    private GameLevel level; // Need reference to level to check game over status
+    private GameLevel level; //This will be used later for milestone 2.
 
     public Controller(Scott scott, EvilEx evilEx, GameLevel level) {
         this.scott = scott;
@@ -30,8 +32,11 @@ public class Controller extends KeyAdapter {
 
             if (code == KeyEvent.VK_R) {
                 scott.resetLives();
-                scott.setPosition(new org.jbox2d.common.Vec2(-10, -5));
-                evilEx.setPosition(new org.jbox2d.common.Vec2(10, -5));
+                scott.setPosition(new org.jbox2d.common.Vec2(-10, -8));
+                evilEx.setPosition(new org.jbox2d.common.Vec2(10, -8));
+
+                scott.setLinearVelocity(new Vec2(0,0));
+                evilEx.setLinearVelocity(new Vec2(0,0));
             }
             return; // Stop other controls from working
         }
@@ -40,7 +45,8 @@ public class Controller extends KeyAdapter {
         if (code == KeyEvent.VK_W) {
             // I check the vertical velocity to ensure Scott is on the ground before jumping.
             // If I don't check this, he can fly by spamming W *I have used AI to assist on this.
-            if (scott.getLinearVelocity().y < 0.01f) scott.jump(JUMP_SPEED);
+            //if (scott.getLinearVelocity().y < 6f)
+            scott.jump(JUMP_SPEED);
         } else if (code == KeyEvent.VK_A) {
             scott.startWalking(-WALK_SPEED);
         } else if (code == KeyEvent.VK_D) {
@@ -50,7 +56,8 @@ public class Controller extends KeyAdapter {
         // Evil Ex
         if (code == KeyEvent.VK_UP) {
             //Essentially doing the same thing over here.
-            if (evilEx.getLinearVelocity().y < 0.01f) evilEx.jump(JUMP_SPEED);
+            //if (evilEx.getLinearVelocity().y < 6f)
+            evilEx.jump(JUMP_SPEED);
         } else if (code == KeyEvent.VK_LEFT) {
             evilEx.startWalking(-WALK_SPEED);
         } else if (code == KeyEvent.VK_RIGHT) {
