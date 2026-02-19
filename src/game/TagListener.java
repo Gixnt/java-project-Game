@@ -15,6 +15,7 @@ public class TagListener implements CollisionListener {
         this.evilEx = evilEx;
     }
 
+
     @Override
     public void collide(CollisionEvent e) {
         /* I used AI to help me understand 'instanceof'.
