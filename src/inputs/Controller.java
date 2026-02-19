@@ -2,38 +2,55 @@ package inputs;
 
 import characters.EvilEx;
 import characters.Scott;
-import city.cs.engine.Walker;
+import levels.GameLevel;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class Controller extends KeyAdapter {
-    private static final float JUMP_SPEED = 14;
-    private static final float WALK_SPEED = 6;
+    // Adjusting these values changes how the game feels.
+    private static final float JUMP_SPEED = 20;
+    private static final float WALK_SPEED = 10;
 
     private Scott scott;
     private EvilEx evilEx;
+    private GameLevel level; // Need reference to level to check game over status
 
-    public Controller(Scott scott, EvilEx evilEx) {
+    public Controller(Scott scott, EvilEx evilEx, GameLevel level) {
         this.scott = scott;
         this.evilEx = evilEx;
+        this.level = level;
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
 
-        // --- Player 1 (Scott): WASD ---
+        // if Scott has no lives, I disable all keys except 'R' for restart
+        if (scott.getLives() <= 0) {
+
+            if (code == KeyEvent.VK_R) {
+                scott.resetLives();
+                scott.setPosition(new org.jbox2d.common.Vec2(-10, -5));
+                evilEx.setPosition(new org.jbox2d.common.Vec2(10, -5));
+            }
+            return; // Stop other controls from working
+        }
+
+        // Scott Pilgrim
         if (code == KeyEvent.VK_W) {
-            scott.jump(JUMP_SPEED);
+            // I check the vertical velocity to ensure Scott is on the ground before jumping.
+            // If I don't check this, he can fly by spamming W *I have used AI to assist on this.
+            if (scott.getLinearVelocity().y < 0.01f) scott.jump(JUMP_SPEED);
         } else if (code == KeyEvent.VK_A) {
             scott.startWalking(-WALK_SPEED);
         } else if (code == KeyEvent.VK_D) {
             scott.startWalking(WALK_SPEED);
         }
 
-        // --- Player 2 (Evil Ex): Arrow Keys ---
+        // Evil Ex
         if (code == KeyEvent.VK_UP) {
-            evilEx.jump(JUMP_SPEED);
+            //Essentially doing the same thing over here.
+            if (evilEx.getLinearVelocity().y < 0.01f) evilEx.jump(JUMP_SPEED);
         } else if (code == KeyEvent.VK_LEFT) {
             evilEx.startWalking(-WALK_SPEED);
         } else if (code == KeyEvent.VK_RIGHT) {
@@ -44,21 +61,8 @@ public class Controller extends KeyAdapter {
     @Override
     public void keyReleased(KeyEvent e) {
         int code = e.getKeyCode();
-
-
-        if (code == KeyEvent.VK_A || code == KeyEvent.VK_D) {
-            scott.stopWalking();
-        }
-
-
-        if (code == KeyEvent.VK_LEFT || code == KeyEvent.VK_RIGHT) {
-            evilEx.stopWalking();
-        }
-    }
-
-
-    public void updateBodies(Scott s, EvilEx e) {
-        this.scott = s;
-        this.evilEx = e;
+        // We have to stop walking when the key is released, otherwise they slide forever.
+        if (code == KeyEvent.VK_A || code == KeyEvent.VK_D) scott.stopWalking();
+        if (code == KeyEvent.VK_LEFT || code == KeyEvent.VK_RIGHT) evilEx.stopWalking();
     }
 }
