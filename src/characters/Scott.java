@@ -2,6 +2,12 @@ package characters;
 
 import city.cs.engine.*;
 
+
+/*The inheritance of scott extending walker is to contain all the basic logic
+for a character that can move left, right and jump.
+It takes everything Walker can do and adds specific features
+ */
+
 public class Scott extends Walker {
     private static final Shape shape = new BoxShape(1, 3f);
 
@@ -12,7 +18,7 @@ public class Scott extends Walker {
     public Scott(World world) {
         super(world, shape);
         addImage(image);
-        setGravityScale(4f);
+        setGravityScale(3f);
 
     }
 

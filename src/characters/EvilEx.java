@@ -10,7 +10,7 @@ public class EvilEx extends Walker {
     public EvilEx(World world) {
         super(world,shape);
         addImage(image);
-        setGravityScale(4f);
+        setGravityScale(3f);
     }
 
 }
