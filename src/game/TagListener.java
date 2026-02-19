@@ -17,11 +17,14 @@ public class TagListener implements CollisionListener {
 
     @Override
     public void collide(CollisionEvent e) {
-        // Check if the collision is with the EvilEx
+        /* I used AI to help me understand 'instanceof'.
+           This checks if the thing Scott collided with is actually the EvilEx character.
+           If it is, Scott loses a life.
+        */
         if (e.getOtherBody() instanceof EvilEx) {
             scott.decrementLives();
 
-            // "Respawn" them apart so they don't instantly collide again
+            // Respawn them apart so they don't instantly collide again
             scott.setPosition(new Vec2(-10, -10));
             evilEx.setPosition(new Vec2(10, -10));
         }
