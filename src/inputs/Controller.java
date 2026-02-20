@@ -10,7 +10,7 @@ import java.awt.event.KeyEvent;
 
 public class Controller extends KeyAdapter {
     // Adjusting these values changes how the game feels.
-    private static final float JUMP_SPEED = 20;
+    private static final float JUMP_SPEED = 25f;
     private static final float WALK_SPEED = 8;
 
     private Scott scott;
