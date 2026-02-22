@@ -4,6 +4,7 @@ import characters.EvilEx;
 import characters.Scott;
 import city.cs.engine.CollisionEvent;
 import city.cs.engine.CollisionListener;
+import levels.Level1;
 import org.jbox2d.common.Vec2;
 
 public class TagListener implements CollisionListener {
@@ -26,8 +27,13 @@ public class TagListener implements CollisionListener {
             scott.decrementLives();
 
             // Respawn them apart so they don't instantly collide again
-            scott.setPosition(new Vec2(-10, -10));
-            evilEx.setPosition(new Vec2(10, -10));
+            scott.setPosition(new Vec2(-10, Level1.FLOOR_Y + 3f));
+            evilEx.setPosition(new Vec2(10, Level1.FLOOR_Y + 3f));
+
+
+            // Stop their momentum
+            scott.setLinearVelocity(new Vec2(0,0));
+            evilEx.setLinearVelocity(new Vec2(0,0));
         }
     }
 }
