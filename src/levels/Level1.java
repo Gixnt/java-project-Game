@@ -54,7 +54,8 @@ public class Level1 extends GameLevel {
         new SolidFixture(ground, groundShape).setFriction(20f);
 
         // Small center divider, a visual/physical barrier in the middle of the arena.
-        makeBlock(0, FLOOR_Y + 2f, 0.5f, 3f);
+        // Adjusted image size to 3f so the cone isn't tiny
+        makeBlock(0, FLOOR_Y + 2f, 0.5f, 3f, "data/Cone.png", 4f);
 
 
         //Inner zone: spawn players and add barriers/roof blocks
@@ -72,20 +73,22 @@ public class Level1 extends GameLevel {
 
         // Tall barrier blocks between the player area and the teleporters.
         // These become part of the level geometry and prevent players from easily jumping to the teleporters
-        makeBlock(-11f, FLOOR_Y + 3f, 0.5f, 4f);
-        makeBlock(11f, FLOOR_Y + 3f, 0.5f, 4f);
+
+        // Changed to use Pipe.png and increased size to 9f to cover the full height of the wall
+        makeBlock(-11f, FLOOR_Y + 3f, 0.5f, 4f, "data/PipeVertical.png", 9f);
+        makeBlock(11f, FLOOR_Y + 3f, 0.5f, 4f, "data/PipeVertical.png", 9f);
 
         // Roof blocks above teleporters to create a small enclosed area.
-        makeBlock(-13.5f, FLOOR_Y + 7.5f, 3f, 0.5f);
-        makeBlock(13.5f, FLOOR_Y + 7.5f, 3f, 0.5f);
+        makeBlock(-13.8f, FLOOR_Y + 7.5f, 3f, 0.5f, "data/Pipe.png", 4f);
+        makeBlock(13.8f, FLOOR_Y + 7.5f, 3f, 0.5f, "data/Pipe.png", 4f);
 
         //Teleporters - circles the player can touch to be teleported
 
         // Each teleporter also records a safe destination coordinate which is
         // added to `teleportDestinations` so teleportation never drops a player
         // inside geometry.
-        makeTeleporter(-15f, FLOOR_Y + 1.5f, -15f, FLOOR_Y + 3.5f);
-        makeTeleporter(15f, FLOOR_Y + 1.5f, 15f, FLOOR_Y + 3.5f);
+        makeTeleporter(-15f, FLOOR_Y + 3f, -18f, FLOOR_Y + 3f);
+        makeTeleporter(15f, FLOOR_Y + 3f, 18f, FLOOR_Y + 3f);
         makeTeleporter(-40f, FLOOR_Y + 24f, -40f, FLOOR_Y + 25.5f);
         makeTeleporter(40f, FLOOR_Y + 24f, 40f, FLOOR_Y + 25.5f);
 
@@ -100,12 +103,13 @@ public class Level1 extends GameLevel {
         //Middle zone: platforms and bounce/jump pads
 
         // A platform with a jump pad on the left
-        makePlatform(-24f, FLOOR_Y + 7f, 3f, Color.GRAY);
-        makeBouncePad(-24f, FLOOR_Y + 7.6f);
+        // Changed to Platform.png (cloud) and sized to 2.5f to look correct
+        makePlatform(-24f, FLOOR_Y + 7f, 3f, "data/Platform.png", 2.5f);
+        makeBouncePad(-24f, FLOOR_Y + 8.5f);
 
         // A block with a bounce pad on the right
-        makeBlock(24f, FLOOR_Y + 1f, 2.5f, 1f);
-        makeBouncePad(24f, FLOOR_Y + 2.3f);
+        makeBlock(24f, FLOOR_Y + 1f, 2.5f, 1f, "data/Cat.png", 3.5f);
+        makeBouncePad(24f, FLOOR_Y + 3.5f);
 
 
         //Outer zone: vertical moving platforms
@@ -117,9 +121,11 @@ public class Level1 extends GameLevel {
 
         //Center sky structure: platforms and moving elements above the arena
 
-        makePlatform(0f, FLOOR_Y + 15f, 8f, new Color(139, 69, 19));
-        makePlatform(-9f, FLOOR_Y + 22f, 3f, Color.GRAY);
-        makePlatform(9f, FLOOR_Y + 22f, 3f, Color.GRAY);
+        // FIXED: Changed stable platforms to use clouds (Platform.png).
+        // Large center one uses size 5f, smaller ones use 2.5f.
+        makePlatform(0f, FLOOR_Y + 15f, 8f, "data/Platform.png", 5f);
+        makePlatform(-9f, FLOOR_Y + 22f, 3f, "data/Platform.png", 2.5f);
+        makePlatform(9f, FLOOR_Y + 22f, 3f, "data/Platform.png", 2.5f);
 
         // Moving platforms near the top.
         makeVerticalMovingPlatform(0f, FLOOR_Y + 28f, 3f, 4f);
@@ -178,6 +184,9 @@ public class Level1 extends GameLevel {
         portal.setPosition(new Vec2(x, y));
         portal.setFillColor(new Color(0, 255, 255, 100));
 
+        // Increased teleporter image size to 5.5f for more height
+        portal.addImage(new BodyImage("data/Teleporter.png", 5.5f));
+
         // Store a safe destination to choose from when teleporting a player.
         teleportDestinations.add(new Vec2(safeSpawnX, safeSpawnY));
 
@@ -226,38 +235,56 @@ public class Level1 extends GameLevel {
         float h = 4f;
         float thickness = 0.2f;
 
-        makeBlock(x, y, w/2, thickness);
-        makeBlock(x - w/2, y + h/2, thickness, h/2);
-        makeBlock(x + w/2, y + h/2, thickness, h/2);
+        // Increased side pipe size to 4f to cover the vertical height properly
+        makeBlock(x, y, w/2, thickness, "data/Pipe.png", 3f);
+        makeBlock(x - w/2, y + h/2, thickness, h/2, "data/PipeVertical.png", 4f);
+        makeBlock(x + w/2, y + h/2, thickness, h/2, "data/PipeVertical.png", 4f);
     }
 
 
-    private void makePlatform(float x, float y, float width, Color color) {
+    // Updated method to accept Image Path and Size arguments
+    private void makePlatform(float x, float y, float width, String imagePath, float imageSize) {
         Shape shape = new BoxShape(width, 0.3f);
         StaticBody p = new StaticBody(this, shape);
         p.setPosition(new Vec2(x, y));
-        p.setFillColor(color);
+
+
+        p.addImage(new BodyImage(imagePath, imageSize));
         new SolidFixture(p, shape).setFriction(3f);
     }
 
 
-     //Create a rectangular static block used for the platforms.
+    //Create a rectangular static block used for the platforms.
 
     private void makeBlock(float x, float y, float w, float h) {
+        makeBlock(x, y, w, h, null, 0);
+    }
+
+    private void makeBlock(float x, float y, float w, float h, String imagePath, float imageSize) {
         Shape shape = new BoxShape(w, h);
         StaticBody b = new StaticBody(this, shape);
         b.setPosition(new Vec2(x, y));
         b.setFillColor(Color.DARK_GRAY);
         new SolidFixture(b, shape).setFriction(3f);
+
+        // Add image if provided
+        if (imagePath != null) {
+            //Used addImage() instead of new AttachedImage()
+            b.addImage(new BodyImage(imagePath, imageSize));
+        }
     }
 
 
-     //Create a bounce pad. When a Walker touches this pad, they are launched in the air.
+    //Create a bounce pad. When a Walker touches this pad, they are launched in the air.
 
     private void makeBouncePad(float x, float y) {
         StaticBody pad = new StaticBody(this, new BoxShape(1.2f, 0.2f));
         pad.setPosition(new Vec2(x, y));
-        pad.setFillColor(new Color(255, 105, 180));
+
+
+        // JUMP PAD IMAGE LINE: Adjust the number here (currently 2.5f) to change height
+        pad.addImage(new BodyImage("data/JumpPad.png", 3f));
+
         pad.addCollisionListener(new CollisionListener() {
             @Override
             public void collide(CollisionEvent e) {
@@ -276,7 +303,12 @@ public class Level1 extends GameLevel {
         Shape shape = new BoxShape(width, 0.25f);
         final DynamicBody platform = new DynamicBody(this, shape);
         platform.setPosition(new Vec2(startX, startY));
-        platform.setFillColor(new Color(255, 140, 0)); // Orange
+
+
+
+        // Used addImage() and adjusted size to 2.5f to look correct
+        platform.addImage(new BodyImage("data/Platform.png", 2.5f));
+
         platform.setGravityScale(0);
 
         SolidFixture fix = new SolidFixture(platform, shape);
@@ -315,7 +347,13 @@ public class Level1 extends GameLevel {
         Shape shape = new BoxShape(width, 0.4f);
         final DynamicBody platform = new DynamicBody(this, shape);
         platform.setPosition(new Vec2(startX, startY));
-        platform.setFillColor(new Color(50, 205, 50)); // Green
+
+        // Remove fill color so the image shows without a white box
+        platform.setFillColor(new Color(0, 0, 0, 0)); // Transparent
+
+
+        platform.addImage(new BodyImage("data/Platform.png", 2.5f));
+
         platform.setGravityScale(0);
 
         SolidFixture fix = new SolidFixture(platform, shape);
