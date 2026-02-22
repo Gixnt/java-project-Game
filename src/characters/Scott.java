@@ -10,7 +10,7 @@ It takes everything Walker can do and adds specific features
  */
 
 public class Scott extends Walker implements StepListener {
-    private static final Shape shape = new BoxShape(1, 3f);
+    private static final Shape shape = new BoxShape(1, 2.9f);
 
     private static final BodyImage idle = new BodyImage("data/ScottPilgrimIdle.gif", 6f);
 
