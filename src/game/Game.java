@@ -55,6 +55,8 @@ public class Game {
         // Start the actual game.
         level.start();
         view.requestFocus();
+
+        //view.setGridResolution(1);
     }
 
     public static void main(String[] args) {
