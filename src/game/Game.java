@@ -21,7 +21,7 @@ public class Game {
         view = new GameView(level, 800, 600);
         view.setZoom(20);
 
-        // 3. You now connect the controller to the characters
+        // You now connect the controller to the characters
         Scott scott = level.getScott();
         EvilEx evilEx = level.getEvilEx();
         controller = new Controller(scott, evilEx, level);
