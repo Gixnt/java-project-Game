@@ -38,6 +38,11 @@ public class Level1 extends GameLevel {
     // Accumulates the time passed across steps.
     private float timeAccumulator = 0f;
 
+    // Survival timer for about 30 seconds.
+    private float survivalTimer = 30f;
+
+    private java.awt.Image bgImage = new javax.swing.ImageIcon("data/ScottPilgrimBackground.jpg").getImage();
+
     public Level1() {
         super();
 
@@ -58,7 +63,7 @@ public class Level1 extends GameLevel {
         makeBlock(0, FLOOR_Y + 2f, 0.5f, 3f, "data/Cone.png", 4f);
 
 
-        //Inner zone: spawn players and add barriers/roof blocks
+        //Inner zone spawn players and add barriers/roof blocks
 
         // Create the player and enemy characters and place them on the left/right
         // of the center divider. GameLevel stores references to these so other
@@ -82,7 +87,7 @@ public class Level1 extends GameLevel {
         makeBlock(-13.8f, FLOOR_Y + 7.5f, 3f, 0.5f, "data/Pipe.png", 4f);
         makeBlock(13.8f, FLOOR_Y + 7.5f, 3f, 0.5f, "data/Pipe.png", 4f);
 
-        //Teleporters - circles the player can touch to be teleported
+        //Teleporters circles the player can touch to be teleported
 
         // Each teleporter also records a safe destination coordinate which is
         // added to `teleportDestinations` so teleportation never drops a player
@@ -121,7 +126,7 @@ public class Level1 extends GameLevel {
 
         //Center sky structure: platforms and moving elements above the arena
 
-        // FIXED: Changed stable platforms to use clouds (Platform.png).
+        // Changed stable platforms to use clouds.
         // Large center one uses size 5f, smaller ones use 2.5f.
         makePlatform(0f, FLOOR_Y + 15f, 8f, "data/Platform.png", 5f);
         makePlatform(-9f, FLOOR_Y + 22f, 3f, "data/Platform.png", 2.5f);
@@ -133,7 +138,7 @@ public class Level1 extends GameLevel {
         makeHorizontalMovingPlatform(14f, FLOOR_Y + 30f, 2.5f, 4f);
 
 
-        //Gameplay wiring: tag collisions and pre-step updates
+        //Gameplay wiring tag collisions and pre-step updates
 
         // TagListener handles interactions between Scott and EvilEx, for
         // example, checking when Scott tags the enemy or vice versa.
@@ -145,10 +150,16 @@ public class Level1 extends GameLevel {
         addStepListener(new StepListener() {
             @Override
             public void preStep(StepEvent stepEvent) {
-                // Keep track of the total time passed; used by moving platforms
+                // Keep track of the total time passed, used by moving platforms
                 timeAccumulator += stepEvent.getStep();
-                // If a player walks off the right edge, teleport them to the left
-                // and vice versa. This keeps the gameplay area continuous.
+
+                //Only tick the timer down if Scott is alive!
+                if (getScott().getLives() > 0) {
+                    survivalTimer -= stepEvent.getStep();
+                }
+
+
+                // If a player walks off the right edge, teleport them to the left and vice versa
                 wrapPlayer(getScott());
                 wrapPlayer(getEvilEx());
             }
@@ -160,8 +171,8 @@ public class Level1 extends GameLevel {
 
 
     /*
-     * If the player crosses the horizontal boundary WALL_X, move them to the
-     * opposite side so the level wraps horizontally.
+     * If the player crosses the horizontal boundary of wall_x you move them to the
+      opposite side
      */
     private void wrapPlayer(Walker player) {
         if (player == null) return;
@@ -190,13 +201,10 @@ public class Level1 extends GameLevel {
         // Store a safe destination to choose from when teleporting a player.
         teleportDestinations.add(new Vec2(safeSpawnX, safeSpawnY));
 
-        portal.addCollisionListener(new CollisionListener() {
-            @Override
-            public void collide(CollisionEvent e) {
-                // Only teleport Walkers and only if enough time has passed
-                if (e.getOtherBody() instanceof Walker && System.currentTimeMillis() - lastTeleportTime > 2000) {
-                    teleportPlayerRandomly((Walker) e.getOtherBody());
-                }
+        portal.addCollisionListener(e -> {
+            // Only teleport Walkers and only if enough time has passed
+            if (e.getOtherBody() instanceof Walker && System.currentTimeMillis() - lastTeleportTime > 2000) {
+                teleportPlayerRandomly((Walker) e.getOtherBody());
             }
         });
     }
@@ -226,6 +234,10 @@ public class Level1 extends GameLevel {
         // Move the player instantly to the chosen safe position and stop movement
         player.setPosition(dest);
         player.setLinearVelocity(new Vec2(0, 0));
+
+        //this is just so if the player does get teleported it will play a sound.
+        if (teleportSound != null) teleportSound.play();
+
         lastTeleportTime = System.currentTimeMillis();
     }
 
@@ -269,7 +281,7 @@ public class Level1 extends GameLevel {
 
         // Add image if provided
         if (imagePath != null) {
-            //Used addImage() instead of new AttachedImage()
+            //Used addImage()instead of new AttachedImage()
             b.addImage(new BodyImage(imagePath, imageSize));
         }
     }
@@ -282,16 +294,13 @@ public class Level1 extends GameLevel {
         pad.setPosition(new Vec2(x, y));
 
 
-        // JUMP PAD IMAGE LINE: Adjust the number here (currently 2.5f) to change height
+
         pad.addImage(new BodyImage("data/JumpPad.png", 3f));
 
-        pad.addCollisionListener(new CollisionListener() {
-            @Override
-            public void collide(CollisionEvent e) {
-                if (e.getOtherBody() instanceof Walker) {
-                    // Give the walker a strong upward velocity to simulate a jump pad
-                    ((Walker) e.getOtherBody()).setLinearVelocity(new Vec2(0, 35f));
-                }
+        pad.addCollisionListener(e -> {
+            if (e.getOtherBody() instanceof Walker) {
+                // Give the walker a strong upward velocity to simulate a jump pad
+                ((Walker) e.getOtherBody()).setLinearVelocity(new Vec2(0, 35f));
             }
         });
     }
@@ -306,7 +315,7 @@ public class Level1 extends GameLevel {
 
 
 
-        // Used addImage() and adjusted size to 2.5f to look correct
+
         platform.addImage(new BodyImage("data/Platform.png", 2.5f));
 
         platform.setGravityScale(0);
@@ -383,5 +392,21 @@ public class Level1 extends GameLevel {
     }
 
     @Override
-    public boolean isComplete() { return getScott().getLives() <= 0; }
+    public boolean isComplete() {
+        // Only completes the level to go to Level 2 if the timer ends AND Scott is alive.
+        return survivalTimer <= 0 && getScott().getLives() > 0;
+    }
+
+    @Override
+    public java.awt.Image getBackgroundImage() { return bgImage; }
+
+    @Override
+    public float getTimeRemaining() { return survivalTimer; }
+
+    @Override
+    public String getLevelName() { return "Level 1: The Chase"; }
+
+    public void resetTimer() {
+        this.survivalTimer = 30f;
+    }
 }
