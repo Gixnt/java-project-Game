@@ -107,7 +107,7 @@ public class EvilEx extends Walker implements StepListener {
 
     public boolean isFacingRight() { return facingRight; }
 
-    // ENRAGE GETTERS
+    // enrage getters
     public boolean isEnraged() { return isEnraged; }
     public float getEnrageTimer() { return enrageTimer; }
     public float getEnrageCooldown() { return enrageCooldown; }
