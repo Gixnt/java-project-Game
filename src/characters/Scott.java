@@ -51,7 +51,7 @@ public class Scott extends Walker implements StepListener {
     private int ammo = 0;
     private boolean hasGun = false;
 
-    // MELEE & BLOCK STATES
+    // fighting and blocking states
     private boolean isBlocking = false;
     private float attackTimer = 0f;
     private float kickCooldown = 0f;
